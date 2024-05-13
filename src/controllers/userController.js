@@ -50,7 +50,7 @@ export const memberLogin = async (req,res) => {
       }
     }
     else {
-      return res.send({message : "사용자가 존재하지 않습니다.", result : false})
+      return res.send({message : "사용자가 존재하지 않습니다.", result2 : false})
     }
   } catch (error) {
     console.log(error)
