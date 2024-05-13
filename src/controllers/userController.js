@@ -46,7 +46,7 @@ export const memberLogin = async (req,res) => {
       else {
         const salt = bcrypt.genSaltSync(5);
         const hashedID = bcrypt.hashSync(rows[0].user_id, salt);
-        return res.send({result : true, token : hashedID})
+        return res.send({result : true, token : hashedID, user_id})
       }
     }
     else {
