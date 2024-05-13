@@ -56,3 +56,113 @@ export const memberLogin = async (req,res) => {
     console.log(error)
   }
 }
+
+export const kakaoLogin = async (req, res) => {
+  // step 1. 인가코드 받기
+  const {
+      query: { code },
+  } = req;
+
+  // step 2. 토큰 받기
+  const KAKAO_BASE_PATH = 'https://kauth.kakao.com/oauth/token';
+  const config = {
+      grant_type: 'authorization_code',
+      client_id: process.env.CLIENT_ID,
+      redirect_uri: process.env.REDIRECT_URI,
+      code,
+  };
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${KAKAO_BASE_PATH}?${params}`;
+  const data = await fetch(finalUrl, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+  });
+  const tokenRequest = await data.json();
+
+  // step 3. 사용자 정보 받기
+  const { access_token } = tokenRequest;
+  if (access_token) {
+      const userRequest = await fetch('https://kapi.kakao.com/v2/user/me', {
+          headers: {
+              Authorization: `Bearer ${access_token}`,
+          },
+      });
+      const userData = await userRequest.json();
+      const {
+          properties: { nickname },
+          kakao_account: { email },
+      } = userData;
+      const salt = bcrypt.genSaltSync(5);
+      const token = bcrypt.hashSync(nickname, salt)
+      console.log(nickname, email)
+      const findQuery = `select * from User where user_id = ?`
+      const [rows, fields] = await db.execute(findQuery, [nickname]);
+      // 존재하면 로그인
+      console.log(rows)
+      if (rows.length > 0) {
+        const user_id = rows[0].user_id
+        const hashedID = bcrypt.hashSync(user_id, salt);
+        return res.send({result : true, token : hashedID, user_id})
+      }
+      else {
+        const hashedPassword = bcrypt.hashSync(email, salt);
+        const registerQuery = `INSERT INTO User (user_id, user_pw) VALUES (?, ?)`
+        await db.execute(registerQuery,[nickname, hashedPassword])
+        return res.send({result : true, token : token, user_id : nickname})
+      }
+    }
+  }
+//구글 로그인
+export const googleLogin = async (req, res) => {
+  const {
+      query: { code },
+  } = req;
+  const GOOGLE_BASE_PATH = 'https://oauth2.googleapis.com/token';
+  const config = {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_SECRET_ID,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URL,
+      grant_type: 'authorization_code',
+  };
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${GOOGLE_BASE_PATH}?${params}`;
+  const data = await fetch(finalUrl, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+  });
+  const tokenRequest = await data.json();
+  const { access_token } = tokenRequest;
+  if (access_token) {
+      const userRequest = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: {
+              Authorization: `Bearer ${access_token}`,
+          },
+      });
+      const userData = await userRequest.json();
+      const {
+        id,email,name
+      } = userData
+      console.log(id, email, name)
+      const salt = bcrypt.genSaltSync(5);
+      const token = bcrypt.hashSync(id, salt)
+      const findQuery = 'select * from User where user_id = ?'
+      const [rows, fields] = await db.execute(findQuery,[name]);
+      if (rows.length > 0) {
+        const user_id = rows[0].user_id
+        const hashedID = bcrypt.hashSync(user_id, salt);
+        return res.send({result : true, token : hashedID, user_id})
+      }
+      else {
+        const registerQuery = `INSERT INTO User (user_id, user_pw) VALUES (?, ?)`
+        const hashedPassword = bcrypt.hashSync(email, salt);
+        await db.execute(registerQuery,[name, hashedPassword]);
+        return res.send({result : true, token : token, user_id : name})
+        
+      }
+    }
+  }
