@@ -23,7 +23,7 @@ export const memberRegister = async (req,res) => {
         return res.send({messages: "가입 성공", result : true})
       }
       else {
-        return res.send({ message : "비밀번호가 같지 않습니다.", result : false})
+        return res.send({ message : "비밀번호가 같지 않습니다.", result2 : false})
       }
     }
   } catch (error) {
