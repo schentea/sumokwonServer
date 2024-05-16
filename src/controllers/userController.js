@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import db from "../config/db.js";
 import bcrypt from 'bcrypt';
+import fetch from 'node-fetch';
 
 export const memberRegister = async (req,res) => {
   
