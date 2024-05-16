@@ -166,3 +166,25 @@ export const googleLogin = async (req, res) => {
       }
     }
   }
+  //내일 비밀번호 수정 이어서 => 지금까지는 user_id받아옴
+export const passwordEdit = async (req, res) => {
+  const { passwordEdit,user_id } = req.body;
+  console.log(passwordEdit, user_id)
+  try {
+    if(passwordEdit === "") {
+      return res.send({result : false , message : "적절한 비밀번호를 입력해주세요."})
+    }
+    const salt = bcrypt.genSaltSync(5);
+    const hashedPassword = bcrypt.hashSync(passwordEdit, salt);
+    const updatePwQuery = 'update User set user_pw = ? where user_id = ?'
+    await db.execute(updatePwQuery,[hashedPassword,user_id])
+    return res.send({result: true, message:"비밀번호 변경 성공"})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+//큐알 테스트
+export const testQr = async (req,res) => {
+  console.log(req.body)
+}
