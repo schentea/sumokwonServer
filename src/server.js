@@ -7,7 +7,7 @@ import userRouter from "./routers/userRouter.js";
 
 const corsOptions = {
   origin : [
-    "http://localhost:3000",
+    "http://localhost:3000","https://sumokwon.netlify.app"
   ]
 }
 const app = express();
