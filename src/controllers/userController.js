@@ -167,7 +167,7 @@ export const googleLogin = async (req, res) => {
       }
     }
   }
-  //내일 비밀번호 수정 이어서 => 지금까지는 user_id받아옴
+  //비밀 번호 수정
 export const passwordEdit = async (req, res) => {
   const { passwordEdit,user_id } = req.body;
   console.log(passwordEdit, user_id)
@@ -188,4 +188,23 @@ export const passwordEdit = async (req, res) => {
 //큐알 테스트
 export const testQr = async (req,res) => {
   console.log(req.body)
+}
+
+// 유저에 대한 스탬프 정보
+export const stampInfo = async (req,res) => {
+  const {token, userid} = req.body
+  try {
+    const ok = bcrypt.compareSync(userid, token)
+    if(ok) {
+      const findUserNoQuery = 'select user_no from User where user_id = ?'
+      const [rows, flieds] = await db.execute(findUserNoQuery,[userid]);
+      const user_no = rows[0].user_no
+
+      const findUserStampQuery = 'select stamp_id, is_collected from UserStamp where user_no=?'
+      const result = await db.execute(findUserStampQuery,[user_no])
+      return res.send({result : true, data : result[0]})
+    }
+  } catch (error) {
+    return res.send({result :false, message:"데이터베이스 오류"})
+  }
 }
