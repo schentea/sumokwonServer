@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import db from "../config/db.js";
 import bcrypt from 'bcrypt';
+import { getDistanceBetweenPoints } from '../func/getDistance.js';
 
 export const memberRegister = async (req,res) => {
   
@@ -185,11 +186,6 @@ export const passwordEdit = async (req, res) => {
   }
 }
 
-//큐알 테스트
-export const testQr = async (req,res) => {
-  console.log(req.body)
-}
-
 // 유저에 대한 스탬프 정보
 export const stampInfo = async (req,res) => {
   const {token, userid} = req.body
@@ -206,5 +202,47 @@ export const stampInfo = async (req,res) => {
     }
   } catch (error) {
     return res.send({result :false, message:"데이터베이스 오류"})
+  }
+}
+
+//큐알 테스트
+export const testQr = async (req,res) => {
+  
+  const {data, user, userLocation } =req.body
+  const userLatitude = userLocation.latitude
+  const userLongitude = userLocation.longitude
+  const stamp = JSON.parse(data)
+  const {no, latitude, longitude} = stamp
+  const distance = getDistanceBetweenPoints(latitude, longitude, userLatitude, userLongitude)
+  // console.log(`두 지점 사이의 거리: ${distance.toFixed(2)} 미터`, typeof(distance))
+  // console.log(no, name,latitude, longitude, user, userLatitude, userLongitude)
+  
+ 
+  try { 
+    const ok = bcrypt.compareSync(user.user_id, user.token)
+    if(ok) {
+      const findQuery = "select user_no from User where user_id = ?"
+      const [rows, fields] = await db.execute(findQuery,[user.user_id])
+      const user_no = rows[0].user_no
+      if(distance < 200){
+        const isCollectedQuery = 'select is_collected from UserStamp where user_no =? and stamp_id = ?';
+        const queryRes = await db.execute(isCollectedQuery,[user_no, no])
+        const isCollected = queryRes[0][0].is_collected
+        if(isCollected === 1) {
+          return res.send({result : false, message : "이미 스캔한 QR코드 입니다."})
+        }
+        else {
+          const updateUserStampQuery = "UPDATE UserStamp SET is_collected = TRUE WHERE user_no = ? and stamp_id = ?"
+          await db.execute(updateUserStampQuery,[user_no,no])
+          return res.send({result : true , message :"QR코드 스캔 성공"})
+       }
+      }
+      else {
+        return res.send({result :false, message :"지정된 범위를 벗어나셨습니다."})
+      }
+      
+    }
+  } catch (error) {
+    return res.send({result : false, message:"데이터 전송 실패"})
   }
 }
