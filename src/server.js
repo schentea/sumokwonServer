@@ -4,7 +4,7 @@ import cors from "cors";
 import morgan from "morgan";
 import db from "./config/db.js";
 import userRouter from "./routers/userRouter.js";
-import cookieParser from "cookie-parser";
+
 
 const corsOptions = {
   origin : [
@@ -15,7 +15,6 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json());
-app.use(cookieParser())
 app.use(morgan("dev"))
 app.use(cors(corsOptions))
 
