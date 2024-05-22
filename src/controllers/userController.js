@@ -224,7 +224,7 @@ export const testQr = async (req,res) => {
       const findQuery = "select user_no from User where user_id = ?"
       const [rows, fields] = await db.execute(findQuery,[user.user_id])
       const user_no = rows[0].user_no
-      if(distance < 0.5){
+      if(distance < 1){
         const isCollectedQuery = 'select is_collected from UserStamp where user_no =? and stamp_id = ?';
         const queryRes = await db.execute(isCollectedQuery,[user_no, no])
         const isCollected = queryRes[0][0].is_collected
