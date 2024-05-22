@@ -214,7 +214,7 @@ export const testQr = async (req,res) => {
   const stamp = JSON.parse(data)
   const {no, latitude, longitude} = stamp
   const distance = getDistanceBetweenPoints(latitude, longitude, userLatitude, userLongitude)
-  // console.log(`두 지점 사이의 거리: ${distance.toFixed(2)} 미터`, typeof(distance))
+  console.log(`두 지점 사이의 거리: ${distance.toFixed(2)} 미터`, typeof(distance))
   // console.log(no, name,latitude, longitude, user, userLatitude, userLongitude)
   console.log(distance)
  
