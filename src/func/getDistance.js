@@ -15,6 +15,8 @@ export const getDistanceBetweenPoints = (lat1, lon1, lat2, lon2) => {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   const distance = R * c;
-
+  if(distance < 1) {
+    distance = 1;
+  }
   return distance;
 };
