@@ -4,12 +4,12 @@ import cookieMiddleware from '../middle/cookie.js';
 
 const userRouter = express.Router()
 userRouter.use(cookieMiddleware.readCookies)
-userRouter.use(cookieMiddleware.setCookie)
-userRouter.post('/register', memberRegister);
-userRouter.post('/login', memberLogin)
-userRouter.get('/socials/kakao', kakaoLogin);
-userRouter.get('/socials/google', googleLogin);
-userRouter.post('/passwordEdit', passwordEdit)
-userRouter.post('/testQr', testQr)
-userRouter.post('/stampInfo', stampInfo)
+
+userRouter.post('/register',cookieMiddleware.setCookie, memberRegister);
+userRouter.post('/login',cookieMiddleware.setCookie, memberLogin)
+userRouter.get('/socials/kakao',cookieMiddleware.setCookie, kakaoLogin);
+userRouter.get('/socials/google',cookieMiddleware.setCookie, googleLogin);
+userRouter.post('/passwordEdit',cookieMiddleware.setCookie, passwordEdit)
+userRouter.post('/testQr',cookieMiddleware.setCookie, testQr)
+userRouter.post('/stampInfo',cookieMiddleware.setCookie, stampInfo)
 export default userRouter;

@@ -1,7 +1,12 @@
 const cookieMiddleware = {}
 
 cookieMiddleware.setCookie = (req, res, next) => {
-  res.cookie('myCookieName','cookieValue', {maxAge:900000, httpOnly:false});
+  res.cookie('myCookieName','cookieValue', {
+    maxAge:900000, 
+    httpOnly:true,
+    domain : 'daegusumokwon.netlify.app',
+    path : '/'
+  });
   next()
 };
 
