@@ -4,7 +4,7 @@ cookieMiddleware.setCookie = (req, res, next) => {
     res.cookie('name', 'cookieValue', {
         maxAge: 900000,
         httpOnly: true,
-        domain: 'port-0-sumokwonserver-17xco2nlstnj7hw.sel5.cloudtype.app',
+        domain: 'daegusumokwon.netlify.app',
         path: '/'
     });
     next();
