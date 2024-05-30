@@ -153,7 +153,7 @@ export const googleLogin = async (req, res) => {
       const salt = bcrypt.genSaltSync(5);
       const token = bcrypt.hashSync(id, salt)
       const findQuery = 'select * from User where user_id = ?'
-      const [rows, fields] = await db.execute(findQuery,[name]);
+      const [rows, fields] = await db.execute(findQuery,[email]);
       if (rows.length > 0) {
         const user_id = rows[0].user_id
         const hashedID = bcrypt.hashSync(user_id, salt);
@@ -162,8 +162,8 @@ export const googleLogin = async (req, res) => {
       else {
         const registerQuery = `INSERT INTO User (user_id, user_pw) VALUES (?, ?)`
         const hashedPassword = bcrypt.hashSync(email, salt);
-        await db.execute(registerQuery,[name, hashedPassword]);
-        return res.send({result : true, token : token, user_id : name})
+        await db.execute(registerQuery,[email, hashedPassword]);
+        return res.send({result : true, token : token, user_id : email})
         
       }
     }
