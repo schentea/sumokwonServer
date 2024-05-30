@@ -195,7 +195,6 @@ export const stampInfo = async (req,res) => {
       const findUserNoQuery = 'select user_no from User where user_id = ?'
       const [rows, flieds] = await db.execute(findUserNoQuery,[userid]);
       const user_no = rows[0].user_no
-      console.log(userid, user_no)
       const findUserStampQuery = 'select stamp_id, is_collected from UserStamp where user_no=?'
       const result = await db.execute(findUserStampQuery,[user_no])
       return res.send({result : true, data : result[0]})
